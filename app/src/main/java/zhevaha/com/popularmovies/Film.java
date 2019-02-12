@@ -1,6 +1,8 @@
 package zhevaha.com.popularmovies;
 
-class Film {
+import java.io.Serializable;
+
+class Film implements Serializable {
 
 
     private String originalTitle, title, overview, original_language, posterPath, backdropPath, adult, releaseDate;
@@ -8,6 +10,7 @@ class Film {
     private long id, voteCount;
     private int[] genreIds;
     private boolean video;
+
 
     public String getOriginalTitle() {
         return originalTitle;

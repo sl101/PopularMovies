@@ -1,6 +1,7 @@
 package zhevaha.com.popularmovies;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
+    private final static String FILE_NAME = "api_key";
     private final String LOG_TAG = "PopularMoview";
     private GridView gridView;
     private List<Film> mFilmList;
@@ -33,8 +35,10 @@ public class MainActivity extends Activity {
         @Override
         public void onItemClick(AdapterView<?> parent, View v, int position,
                                 long id) {
-            mSelectText.setText(String.valueOf(position));
-//            Log.d(LOG_TAG, "position # : " + String.valueOf(position));
+            Film film = mFilmList.get( position );
+            Intent intent = new Intent( MainActivity.this, FilmOverview.class );
+            intent.putExtra( Film.class.getSimpleName(), film );
+            startActivity( intent );
         }
     };
 
@@ -46,18 +50,40 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        super.onCreate( savedInstanceState );
+        setContentView( R.layout.activity_main );
 
-        mSelectText = (TextView) findViewById(R.id.ad_Block);
-        gridView = (GridView) findViewById(R.id.gv_images );
-        gridView.setOnItemClickListener(gridviewOnItemClickListener);
+        mSelectText = (TextView) findViewById( R.id.ad_Block );
+        gridView = (GridView) findViewById( R.id.gv_images );
+        gridView.setOnItemClickListener( gridviewOnItemClickListener );
         updateFilmLibrary();
     }
 
     private void updateFilmLibrary() {
-        String query = "http://api.themoviedb.org/3/movie/popular?api_key=f4ca38bc9fdb107e48dc28c3483ba7a0";
-        new FetchFilmLiblaryTask(query).execute();
+        String apiKey = getApiKey();
+        String query = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey;
+        new FetchFilmLiblaryTask( query ).execute();
+    }
+
+    private String getApiKey() {
+
+        String result = "";
+        StringBuilder text = new StringBuilder();
+
+        InputStream is = getResources().openRawResource( R.raw.api_key );
+        try {
+            BufferedReader reader = new BufferedReader( new InputStreamReader( is ) );
+            while ((result = reader.readLine()) != null) {
+                text.append( result );
+            }
+            result = text.toString();
+//            Log.d( LOG_TAG, " result = " + result );
+            reader.close();
+            return result;
+        } catch (IOException e) {
+            Log.d( LOG_TAG, e.getMessage() );
+        }
+        return null;
     }
 
     private class FetchFilmLiblaryTask extends AsyncTask<String, Void, List<Film>> {
@@ -90,8 +116,8 @@ public class MainActivity extends Activity {
             List<Film> resultStrs = new ArrayList<Film>();
 
             try {
-                JSONObject filmLibraryJson = new JSONObject(filmLibraryJsonStr);
-                JSONArray filmLibraryArray = filmLibraryJson.getJSONArray("results");
+                JSONObject filmLibraryJson = new JSONObject( filmLibraryJsonStr );
+                JSONArray filmLibraryArray = filmLibraryJson.getJSONArray( "results" );
 
                 for (int i = 0; i < filmLibraryArray.length(); i++) {
                     String description;
@@ -99,21 +125,21 @@ public class MainActivity extends Activity {
                     String poster;
                     Long id;
 
-                    JSONObject filmLibrary = filmLibraryArray.getJSONObject(i);
+                    JSONObject filmLibrary = filmLibraryArray.getJSONObject( i );
                     Film film = new Film();
-                    id = filmLibrary.getLong(ID);
-                    film.setId(id);
-                    title = filmLibrary.getString(TITLE);
-                    film.setTitle(title);
-                    description = filmLibrary.getString(OVERVIEW);
-                    film.setOverview(description);
-                    poster = filmLibrary.getString(POSTER_PATH);
-                    film.setPosterPath(poster);
-                    resultStrs.add(film);
+                    id = filmLibrary.getLong( ID );
+                    film.setId( id );
+                    title = filmLibrary.getString( TITLE );
+                    film.setTitle( title );
+                    description = filmLibrary.getString( OVERVIEW );
+                    film.setOverview( description );
+                    poster = filmLibrary.getString( POSTER_PATH );
+                    film.setPosterPath( poster );
+                    resultStrs.add( film );
 //                    Log.e(LOG_TAG, "Array: \n" + resultStrs.toString());
                 }
             } catch (JSONException e) {
-                Log.e(LOG_TAG, "JSONException: \n" + e.toString());
+                Log.e( LOG_TAG, "JSONException: \n" + e.toString() );
             }
             return resultStrs;
         }
@@ -137,17 +163,17 @@ public class MainActivity extends Activity {
                 try {
                     // Construct the URL for the Themoviedb query
                     // Possible parameters are avaiable at API page
-                     URL url = new URL(mQuery);
+                    URL url = new URL( mQuery );
 
                     // Create the request to Themoviedb, and open the connection
                     urlConnection = (HttpURLConnection) url.openConnection();
                     if (urlConnection != null) {
 //                        int status = urlConnection.getResponseCode();
 //                    Log.d(LOG_TAG, "urlConnection status = " + status);
-                        urlConnection.setRequestMethod("GET");
+                        urlConnection.setRequestMethod( "GET" );
                         urlConnection.connect();
                     } else {
-                        Log.d(LOG_TAG, "urlConnection null");
+                        Log.d( LOG_TAG, "urlConnection null" );
                         return null;
                     }
 
@@ -160,18 +186,18 @@ public class MainActivity extends Activity {
 //                        Log.v(LOG_TAG, "inputStream: " + null);
                         return null;
                     }
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
+                    reader = new BufferedReader( new InputStreamReader( inputStream ) );
                     String line;
                     while ((line = reader.readLine()) != null) {
                         // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                         // But it does make debugging a *lot* easier if you print out the completed
                         // buffer for debugging.
-                        buffer.append(line + "\n");
+                        buffer.append( line + "\n" );
                     }
                     if (buffer.length() == 0) {
                         // Stream was empty.  No point in parsing.
 
-                        Log.v(LOG_TAG, "FilmLibrary string: " + null);
+                        Log.v( LOG_TAG, "FilmLibrary string: " + null );
                         return null;
                     }
                     filmLibraryJsonStr = buffer.toString();
@@ -181,13 +207,13 @@ public class MainActivity extends Activity {
                         try {
                             reader.close();
                         } catch (final IOException e) {
-                            Log.e(LOG_TAG, "Error closing stream", e);
+                            Log.e( LOG_TAG, "Error closing stream", e );
                         }
                     } else {
-                        Log.e(LOG_TAG, "reader = null");
+                        Log.e( LOG_TAG, "reader = null" );
                     }
                 } catch (IOException e) {
-                    Log.e(LOG_TAG, "Error ", e);
+                    Log.e( LOG_TAG, "Error ", e );
                     return null;
                 } finally {
                     if (urlConnection != null) {
@@ -197,7 +223,7 @@ public class MainActivity extends Activity {
                         try {
                             reader.close();
                         } catch (final IOException e) {
-                            Log.e(LOG_TAG, "Error closing stream", e);
+                            Log.e( LOG_TAG, "Error closing stream", e );
                         }
                     }
                 }
@@ -205,9 +231,9 @@ public class MainActivity extends Activity {
                 try {
 //                    Log.d(LOG_TAG, filmLibraryJsonStr);
 
-                    return getFilmLibraryDataFromJson(filmLibraryJsonStr);
+                    return getFilmLibraryDataFromJson( filmLibraryJsonStr );
                 } catch (JSONException e) {
-                    Log.e(LOG_TAG, e.getMessage(), e);
+                    Log.e( LOG_TAG, e.getMessage(), e );
                     e.printStackTrace();
                 }
                 // This will only happen if there was an error getting or parsing the date.
@@ -221,8 +247,8 @@ public class MainActivity extends Activity {
 
             if (result != null) {
                 mFilmList = result;
-                mAdapter = new ImageAdapter(getApplicationContext(), mFilmList);
-                gridView.setAdapter(mAdapter);
+                mAdapter = new ImageAdapter( getApplicationContext(), mFilmList );
+                gridView.setAdapter( mAdapter );
             }
         }
     }

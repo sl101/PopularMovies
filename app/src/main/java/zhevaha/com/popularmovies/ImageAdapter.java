@@ -22,11 +22,11 @@ public class ImageAdapter extends ArrayAdapter<Film> {
 
     public ImageAdapter(Context c, List<Film> filmsArray) {
 
-        super(c, 0, filmsArray);
+        super( c, 0, filmsArray );
         mContext = c;
         this.filmsArray = filmsArray;
         lInflater = (LayoutInflater) mContext
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                .getSystemService( Context.LAYOUT_INFLATER_SERVICE );
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ImageAdapter extends ArrayAdapter<Film> {
 
     @Override
     public Film getItem(int position) {
-        return filmsArray.get(position);
+        return filmsArray.get( position );
     }
 
     @Override
@@ -50,24 +50,23 @@ public class ImageAdapter extends ArrayAdapter<Film> {
         View view = convertView;
         if (view == null) {
             // if it's not recycled, initialize some attributes
-            view = lInflater.inflate(R.layout.item_view, parent, false);
+            view = lInflater.inflate( R.layout.item_view, parent, false );
         }
-        ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
+        ImageView imageView = (ImageView) view.findViewById( R.id.imageView );
 //        RatingBar smallRatingBar = (RatingBar) view.findViewById(R.id.ratingBar);
 //        smallRatingBar.setNumStars(5);
 
 //        TextView textView = (TextView) view.findViewById(R.id.textView);
 //        textView.setText(""+film.getTitle());
 
-        Film film = filmsArray.get(position);
+        Film film = filmsArray.get( position );
         Picasso.get()
-                .load("https://image.tmdb.org/t/p/w500" + film.getPosterPath())
-                .into(imageView);
+                .load( "https://image.tmdb.org/t/p/w500" + film.getPosterPath() )
+                .into( imageView );
 
 //        smallRatingBar.setRating((float) film.getVoteAverage());
 //            textView.setText(""+film.getTitle());
 //            Log.d(LOG_TAG, film.getPosterPath());
-
         return view;
     }
 }

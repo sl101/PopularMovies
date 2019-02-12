@@ -15,12 +15,12 @@
         android:id="@+id/gv_images"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="3"
-        android:horizontalSpacing="1dp"
-        android:verticalSpacing="1dp"
         android:layout_weight="2"
         android:gravity="center"
-        android:stretchMode="columnWidth"></GridView>
+        android:horizontalSpacing="1dp"
+        android:numColumns="3"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="1dp"></GridView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
         <!-- A horizontal line between the chatbox and RecyclerView -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="2dp"/>
+            android:layout_height="2dp" />
 
         <TextView
             android:id="@+id/ad_Block"
