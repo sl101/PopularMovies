@@ -53,21 +53,21 @@ public class MainActivity extends Activity {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
 
-        mSelectText = (TextView) findViewById( R.id.ad_Block );
-        gridView = (GridView) findViewById( R.id.gv_images );
+        mSelectText = findViewById( R.id.ad_Block );
+        gridView = findViewById( R.id.gv_images );
         gridView.setOnItemClickListener( gridviewOnItemClickListener );
         updateFilmLibrary();
     }
 
     private void updateFilmLibrary() {
         String apiKey = getApiKey();
-        String query = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey;
-        new FetchFilmLiblaryTask( query ).execute();
+        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey;
+        new FetchFilmLiblaryTask( generalQuery ).execute();
     }
 
     private String getApiKey() {
 
-        String result = "";
+        String result;
         StringBuilder text = new StringBuilder();
 
         InputStream is = getResources().openRawResource( R.raw.api_key );
@@ -113,29 +113,36 @@ public class MainActivity extends Activity {
             final String VOTE_COUNT = "vote_count";
             final String VOTE_AVERAGE = "vote_average";
 
-            List<Film> resultStrs = new ArrayList<Film>();
+            List<Film> resultStrs = new ArrayList<>();
 
             try {
                 JSONObject filmLibraryJson = new JSONObject( filmLibraryJsonStr );
                 JSONArray filmLibraryArray = filmLibraryJson.getJSONArray( "results" );
 
                 for (int i = 0; i < filmLibraryArray.length(); i++) {
-                    String description;
-                    String title;
-                    String poster;
-                    Long id;
 
                     JSONObject filmLibrary = filmLibraryArray.getJSONObject( i );
                     Film film = new Film();
-                    id = filmLibrary.getLong( ID );
+                    Long id = filmLibrary.getLong( ID );
                     film.setId( id );
-                    title = filmLibrary.getString( TITLE );
+                    String originalTitle = filmLibrary.getString( ORIGINAL_TITLE );
+                    film.setOriginalTitle( originalTitle );
+                    String title = filmLibrary.getString( TITLE );
                     film.setTitle( title );
-                    description = filmLibrary.getString( OVERVIEW );
-                    film.setOverview( description );
-                    poster = filmLibrary.getString( POSTER_PATH );
+                    String releaseDate = filmLibrary.getString( RELEASE_DATE );
+                    film.setReleaseDate( releaseDate );
+//                    String adult = filmLibrary.getString( ADULT );
+//                    film.setAdult( adult );
+//                    Double popularity = filmLibrary.getDouble( POPULARITY );
+//                    film.setPopularity( popularity );
+//                    Double voteAverage = filmLibrary.getDouble( VOTE_AVERAGE );
+//                    film.setVoteAverage( voteAverage );
+                    String overview = filmLibrary.getString( OVERVIEW );
+                    film.setOverview( overview );
+                    String poster = filmLibrary.getString( POSTER_PATH );
                     film.setPosterPath( poster );
                     resultStrs.add( film );
+
 //                    Log.e(LOG_TAG, "Array: \n" + resultStrs.toString());
                 }
             } catch (JSONException e) {
@@ -159,7 +166,7 @@ public class MainActivity extends Activity {
                 BufferedReader reader = null;
 
                 // Will contain the raw JSON response as a string.
-                String filmLibraryJsonStr = null;
+                String filmLibraryJsonStr;
                 try {
                     // Construct the URL for the Themoviedb query
                     // Possible parameters are avaiable at API page
@@ -179,7 +186,7 @@ public class MainActivity extends Activity {
 
                     // Read the input stream into a String
                     InputStream inputStream = urlConnection.getInputStream();
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder builder = new StringBuilder();
 
                     if (inputStream == null) {
                         // Nothing to do.
@@ -191,16 +198,16 @@ public class MainActivity extends Activity {
                     while ((line = reader.readLine()) != null) {
                         // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                         // But it does make debugging a *lot* easier if you print out the completed
-                        // buffer for debugging.
-                        buffer.append( line + "\n" );
+                        // builder for debugging.
+                        builder.append( line + "\n" );
                     }
-                    if (buffer.length() == 0) {
+                    if (builder.length() == 0) {
                         // Stream was empty.  No point in parsing.
 
                         Log.v( LOG_TAG, "FilmLibrary string: " + null );
                         return null;
                     }
-                    filmLibraryJsonStr = buffer.toString();
+                    filmLibraryJsonStr = builder.toString();
 //                Log.v(LOG_TAG, "FilmLibrary string: " + filmLibraryJsonStr);
 
                     if (reader != null) {

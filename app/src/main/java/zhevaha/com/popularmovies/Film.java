@@ -73,6 +73,8 @@ class Film implements Serializable {
     }
 
     public void setReleaseDate(String releaseDate) {
+//        SimpleDateFormat sdf = new SimpleDateFormat("MMMM.dd.yyyy");
+//        this.releaseDate = sdf.format(releaseDate).toString();
         this.releaseDate = releaseDate;
     }
 
