@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -17,6 +18,7 @@ public class FilmOverview extends Activity {
     private TextView mTitleView;
     private TextView mReleaseDateView;
     private TextView mOverviewView;
+    private RatingBar mRatingBarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +27,20 @@ public class FilmOverview extends Activity {
 
         mArguments = getIntent().getExtras();
         mImageView = findViewById( R.id.ivOverview );
+        mRatingBarView = findViewById (R.id.ratingBar);
         mTitleView = findViewById( R.id.filmTitle );
         mReleaseDateView = findViewById( R.id.releaseDate );
         mOverviewView = findViewById( R.id.tvOverview );
+
 
         if (mArguments != null) {
             mFilm = (Film) mArguments.getSerializable( Film.class.getSimpleName() );
             Picasso.get()
                     .load( "https://image.tmdb.org/t/p/w500" + mFilm.getPosterPath() )
                     .into( mImageView );
+//            mRatingBarView.setIsIndicator( true );
+            mRatingBarView.setStepSize((float)0.5);
+            mRatingBarView.setRating( (float) mFilm.getVoteAverage()/2 );
             mTitleView.setText( mFilm.getTitle() );
             mReleaseDateView.setText( mFilm.getReleaseDate() );
             mOverviewView.setText( mFilm.getOverview() );

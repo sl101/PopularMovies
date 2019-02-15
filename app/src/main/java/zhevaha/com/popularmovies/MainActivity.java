@@ -135,14 +135,17 @@ public class MainActivity extends Activity {
 //                    film.setAdult( adult );
 //                    Double popularity = filmLibrary.getDouble( POPULARITY );
 //                    film.setPopularity( popularity );
-//                    Double voteAverage = filmLibrary.getDouble( VOTE_AVERAGE );
-//                    film.setVoteAverage( voteAverage );
+
+                    Double voteAverage = filmLibrary.getDouble( VOTE_AVERAGE );
+                    film.setVoteAverage( voteAverage );
                     String overview = filmLibrary.getString( OVERVIEW );
                     film.setOverview( overview );
                     String poster = filmLibrary.getString( POSTER_PATH );
                     film.setPosterPath( poster );
                     resultStrs.add( film );
 
+
+//                    Log.d( LOG_TAG,"Film "+title+" rating = "+voteAverage );
 //                    Log.e(LOG_TAG, "Array: \n" + resultStrs.toString());
                 }
             } catch (JSONException e) {

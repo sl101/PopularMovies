@@ -22,6 +22,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <RatingBar
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                style="?android:attr/ratingBarStyleSmall"
+                android:stepSize="0.5"
+                android:numStars="5"
+                android:isIndicator="true"
+                android:theme="@style/MyRatingBar"/>
 
             <TextView
                 android:id="@+id/filmTitle"
