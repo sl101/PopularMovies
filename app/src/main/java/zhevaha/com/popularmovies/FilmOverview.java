@@ -38,12 +38,13 @@ public class FilmOverview extends Activity {
             Picasso.get()
                     .load( "https://image.tmdb.org/t/p/w500" + mFilm.getPosterPath() )
                     .into( mImageView );
-//            mRatingBarView.setIsIndicator( true );
             mRatingBarView.setStepSize((float)0.5);
             mRatingBarView.setRating( (float) mFilm.getVoteAverage()/2 );
             mTitleView.setText( mFilm.getTitle() );
-            mReleaseDateView.setText( mFilm.getReleaseDate() );
-            mOverviewView.setText( mFilm.getOverview() );
+
+            String date = mFilm.getReleaseDate().substring( 0, 4 );
+            mReleaseDateView.setText( date );
+            mOverviewView.setText( "\t"+mFilm.getOverview() );
 
         } else {
             Log.d( LOG_TAG, "mArguments is null" );
