@@ -1,9 +1,10 @@
 package zhevaha.com.popularmovies;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,7 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private final static String FILE_NAME = "api_key";
     private final String LOG_TAG = "PopularMoview";
@@ -31,6 +32,7 @@ public class MainActivity extends Activity {
     private List<Film> mFilmList;
     private ImageAdapter mAdapter;
     private TextView mSelectText;
+    private SharedPreferences mLanguagePreferences;
     private GridView.OnItemClickListener gridviewOnItemClickListener = new GridView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View v, int position,
@@ -60,9 +62,37 @@ public class MainActivity extends Activity {
     }
 
     private void updateFilmLibrary() {
+
         String apiKey = getApiKey();
-        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey;
+//        String language = "&language=uk";
+        String language = getCustomLanguage();
+        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
         new FetchFilmLiblaryTask( generalQuery ).execute();
+    }
+
+    private String getCustomLanguage() {
+        String languageName = readPrefLanguage();
+        Log.d( LOG_TAG, "languageName = " + languageName );
+        if (languageName.isEmpty()) {
+            List languages = getLanguages();
+        }
+        return "&language=" + languageName;
+    }
+
+    private String readPrefLanguage() {
+        mLanguagePreferences = getPreferences( MODE_PRIVATE );
+        String result = mLanguagePreferences.getString( "englishName", "xx" );
+        return result;
+    }
+
+    private List getLanguages() {
+        List result = new ArrayList();
+        Log.d( LOG_TAG, "result.size() = " + result.size() );
+        if (result.size() == 0) {
+
+            return result;
+        }
+        return result;
     }
 
     private String getApiKey() {
