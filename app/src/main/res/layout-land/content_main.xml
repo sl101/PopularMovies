@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="1dp"
-    tools:context="zhevaha.com.popularmovies.MainActivity">
+    tools:context=".MainActivity">
 
     <View
         android:layout_width="match_parent"
