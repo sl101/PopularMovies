@@ -53,7 +53,7 @@ public class ImageAdapter extends ArrayAdapter<Film> {
             // if it's not recycled, initialize some attributes
             view = lInflater.inflate( R.layout.item_view, parent, false );
         }
-        ImageView imageView = view.findViewById( R.id.imageView );
+        ImageView imageView = view.findViewById( R.id.poster_image_view );
 
 //        RatingBar smallRatingBar = (RatingBar) view.findViewById(R.id.ratingBar);
 //        smallRatingBar.setNumStars(5);

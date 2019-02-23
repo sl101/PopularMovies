@@ -7,10 +7,6 @@
     android:padding="1dp"
     tools:context=".MainActivity">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp" />
-
     <GridView
         android:id="@+id/gv_images"
         android:layout_width="match_parent"
