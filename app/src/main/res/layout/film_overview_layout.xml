@@ -33,8 +33,6 @@
                 android:isIndicator="true"
                 android:theme="@style/MyRatingBar" />
 
-
-
             <TextView
                 android:id="@+id/filmTitle"
                 android:layout_width="match_parent"

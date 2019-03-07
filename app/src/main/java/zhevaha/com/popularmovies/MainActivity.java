@@ -1,19 +1,19 @@
 package zhevaha.com.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -31,16 +31,21 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import static zhevaha.com.popularmovies.ConstantMovies.*;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final static String FILE_NAME = "api_key";
-    private final String LOG_TAG = "PopularMoview";
+//    private final static String FILE_NAME = "api_key";
+//    private final String ENGLISH_NAME = "englishName";
+//    private final String LOG_TAG = "PopularMovies";
+    NavigationView navigationView;
+//    private String ISO_COD = "iso_cod";
+    private String LANGUAGE;
     private GridView gridView;
     private List<Film> mFilmList;
     private ImageAdapter mAdapter;
     private TextView mSelectText;
-    private SharedPreferences mLanguagePreferences;
     private GridView.OnItemClickListener gridviewOnItemClickListener = new GridView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View v, int position,
@@ -51,6 +56,16 @@ public class MainActivity extends AppCompatActivity
             startActivity( intent );
         }
     };
+
+    @Override
+    protected void onRestart() {
+//        Log.d( String.valueOf( LOG_TAG ), "LANGUAGE = " + LANGUAGE );
+//        Log.d( String.valueOf( LOG_TAG ), "readPrefLanguage() = " + readPrefLanguage() );
+        if (LANGUAGE != readPrefLanguage()) {
+            updateFilmLibrary();
+        }
+        super.onRestart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +81,7 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener( toggle );
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById( R.id.nav_view );
+        navigationView = findViewById( R.id.nav_view );
         navigationView.setNavigationItemSelectedListener( this );
 
         mSelectText = findViewById( R.id.ad_Block );
@@ -77,7 +92,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateFilmLibrary() {
-
         String apiKey = getApiKey();
         String language = getCustomLanguage();
         String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
@@ -86,26 +100,13 @@ public class MainActivity extends AppCompatActivity
 
     private String getCustomLanguage() {
         String languageName = readPrefLanguage();
-        Log.d( LOG_TAG, "languageName = " + languageName );
-        if (languageName.isEmpty()) {
-            List languages = getLanguages();
-        }
+        LANGUAGE = languageName;
         return "&language=" + languageName;
     }
 
     private String readPrefLanguage() {
-        mLanguagePreferences = getPreferences( MODE_PRIVATE );
-        String result = mLanguagePreferences.getString( "englishName", "xx" );
-        return result;
-    }
-
-    private List getLanguages() {
-        List result = new ArrayList();
-        Log.d( LOG_TAG, "result.size() = " + result.size() );
-        if (result.size() == 0) {
-
-            return result;
-        }
+        SharedPreferences languagePreferences = getSharedPreferences( String.valueOf( ConstantMovies.APP_PREFERENCES ), Context.MODE_PRIVATE );
+        String result = languagePreferences.getString( String.valueOf( ISO_COD ), "xx" );
         return result;
     }
 
@@ -121,18 +122,17 @@ public class MainActivity extends AppCompatActivity
                 text.append( result );
             }
             result = text.toString();
-//            Log.d( LOG_TAG, " result = " + result );
             reader.close();
             return result;
         } catch (IOException e) {
-            Log.d( LOG_TAG, e.getMessage() );
+            Log.d( String.valueOf( LOG_TAG ), e.getMessage() );
         }
         return null;
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
+        DrawerLayout drawer = findViewById( R.id.drawer_layout );
         if (drawer.isDrawerOpen( GravityCompat.START )) {
             drawer.closeDrawer( GravityCompat.START );
         } else {
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity
 //        return true;
 //    }
 
-//    @Override
+    //    @Override
 //    public boolean onOptionsItemSelected(MenuItem item) {
 //        // Handle action bar item clicks here. The action bar will
 //        // automatically handle clicks on the Home/Up button, so long
@@ -161,28 +161,26 @@ public class MainActivity extends AppCompatActivity
 //
 //        return super.onOptionsItemSelected( item );
 //    }
+    private void showToolsMenu(View view) {
+        Intent intent = new Intent( this, CustomTools.class );
+        intent.putExtra( "iso_cod", readPrefLanguage() );
+        startActivity( intent );
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        switch (id) {
+            case R.id.nav_manage:
+                showToolsMenu( navigationView );
+                break;
+            case R.id.nav_share:
+                break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
+        DrawerLayout drawer = findViewById( R.id.drawer_layout );
         drawer.closeDrawer( GravityCompat.START );
         return true;
     }
@@ -198,7 +196,6 @@ public class MainActivity extends AppCompatActivity
 
         private List<Film> getFilmLibraryDataFromJson(String filmLibraryJsonStr)
                 throws JSONException {
-//            Log.d(LOG_TAG, "getFilmLibraryDataFromJson start ");
             // These are the names of the JSON objects that need to be extracted.
             final String POSTER_PATH = "poster_path";
             final String ADULT = "adult";
@@ -216,7 +213,6 @@ public class MainActivity extends AppCompatActivity
             final String VOTE_AVERAGE = "vote_average";
 
             List<Film> resultStrs = new ArrayList<>();
-
             try {
                 JSONObject filmLibraryJson = new JSONObject( filmLibraryJsonStr );
                 JSONArray filmLibraryArray = filmLibraryJson.getJSONArray( "results" );
@@ -233,11 +229,6 @@ public class MainActivity extends AppCompatActivity
                     film.setTitle( title );
                     String releaseDate = filmLibrary.getString( RELEASE_DATE );
                     film.setReleaseDate( releaseDate );
-//                    String adult = filmLibrary.getString( ADULT );
-//                    film.setAdult( adult );
-//                    Double popularity = filmLibrary.getDouble( POPULARITY );
-//                    film.setPopularity( popularity );
-
                     Double voteAverage = filmLibrary.getDouble( VOTE_AVERAGE );
                     film.setVoteAverage( voteAverage );
                     String overview = filmLibrary.getString( OVERVIEW );
@@ -246,12 +237,9 @@ public class MainActivity extends AppCompatActivity
                     film.setPosterPath( poster );
                     resultStrs.add( film );
 
-
-//                    Log.d( LOG_TAG,"Film "+title+" rating = "+voteAverage );
-//                    Log.e(LOG_TAG, "Array: \n" + resultStrs.toString());
                 }
             } catch (JSONException e) {
-                Log.e( LOG_TAG, "JSONException: \n" + e.toString() );
+                Log.e( String.valueOf( LOG_TAG ), "JSONException: \n" + e.toString() );
             }
             return resultStrs;
         }
@@ -260,11 +248,8 @@ public class MainActivity extends AppCompatActivity
         protected List<Film> doInBackground(String... strings) {
 
             if (mQuery == null) {
-//                Log.e(LOG_TAG, "Params in AsyncTask " + mQuery);
                 return null;
             } else {
-//                Log.e(LOG_TAG, "Params in AsyncTask " + mQuery.toString());
-
                 // These two need to be declared outside the try/catch
                 // so that they can be closed in the finally block.
                 HttpURLConnection urlConnection = null;
@@ -280,52 +265,42 @@ public class MainActivity extends AppCompatActivity
                     // Create the request to Themoviedb, and open the connection
                     urlConnection = (HttpURLConnection) url.openConnection();
                     if (urlConnection != null) {
-//                        int status = urlConnection.getResponseCode();
-//                    Log.d(LOG_TAG, "urlConnection status = " + status);
                         urlConnection.setRequestMethod( "GET" );
                         urlConnection.connect();
                     } else {
-                        Log.d( LOG_TAG, "urlConnection null" );
+                        Log.d( String.valueOf( LOG_TAG ), "urlConnection null" );
                         return null;
                     }
 
-                    // Read the input stream into a String
                     InputStream inputStream = urlConnection.getInputStream();
                     StringBuilder builder = new StringBuilder();
 
                     if (inputStream == null) {
-                        // Nothing to do.
-//                        Log.v(LOG_TAG, "inputStream: " + null);
                         return null;
                     }
                     reader = new BufferedReader( new InputStreamReader( inputStream ) );
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                        // But it does make debugging a *lot* easier if you print out the completed
-                        // builder for debugging.
                         builder.append( line + "\n" );
                     }
                     if (builder.length() == 0) {
-                        // Stream was empty.  No point in parsing.
 
-                        Log.v( LOG_TAG, "FilmLibrary string: " + null );
+                        Log.v( String.valueOf( LOG_TAG ), "FilmLibrary string: " + null );
                         return null;
                     }
                     filmLibraryJsonStr = builder.toString();
-//                Log.v(LOG_TAG, "FilmLibrary string: " + filmLibraryJsonStr);
 
                     if (reader != null) {
                         try {
                             reader.close();
                         } catch (final IOException e) {
-                            Log.e( LOG_TAG, "Error closing stream", e );
+                            Log.e( String.valueOf( LOG_TAG ), "Error closing stream", e );
                         }
                     } else {
-                        Log.e( LOG_TAG, "reader = null" );
+                        Log.e( String.valueOf( LOG_TAG ), "reader = null" );
                     }
                 } catch (IOException e) {
-                    Log.e( LOG_TAG, "Error ", e );
+                    Log.e( String.valueOf( LOG_TAG ), "Error ", e );
                     return null;
                 } finally {
                     if (urlConnection != null) {
@@ -335,20 +310,17 @@ public class MainActivity extends AppCompatActivity
                         try {
                             reader.close();
                         } catch (final IOException e) {
-                            Log.e( LOG_TAG, "Error closing stream", e );
+                            Log.e( String.valueOf( LOG_TAG ), "Error closing stream", e );
                         }
                     }
                 }
 
                 try {
-//                    Log.d(LOG_TAG, filmLibraryJsonStr);
-
                     return getFilmLibraryDataFromJson( filmLibraryJsonStr );
                 } catch (JSONException e) {
-                    Log.e( LOG_TAG, e.getMessage(), e );
+                    Log.e( String.valueOf( LOG_TAG ), e.getMessage(), e );
                     e.printStackTrace();
                 }
-                // This will only happen if there was an error getting or parsing the date.
                 return null;
             }
         }
@@ -356,7 +328,6 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(List<Film> result) {
-
             if (result != null) {
                 mFilmList = result;
                 mAdapter = new ImageAdapter( getApplicationContext(), mFilmList );

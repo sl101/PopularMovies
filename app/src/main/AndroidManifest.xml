@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -24,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name="zhevaha.com.popularmovies.FilmOverview"></activity>
+        <activity android:name="zhevaha.com.popularmovies.CustomTools"></activity>
     </application>
 
 </manifest>
