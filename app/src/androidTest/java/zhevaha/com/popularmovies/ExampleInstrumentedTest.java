@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("zhevaha.com.popularmovies", appContext.getPackageName());
+        assertEquals( "zhevaha.com.navigationdrivertest", appContext.getPackageName() );
     }
 }
