@@ -25,16 +25,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import static zhevaha.com.popularmovies.ConstantMovies.*;
+import static zhevaha.com.popularmovies.ConstantMovies.APP_PREFERENCES;
+import static zhevaha.com.popularmovies.ConstantMovies.ENGLISH_NAME;
+import static zhevaha.com.popularmovies.ConstantMovies.ISO_COD;
+import static zhevaha.com.popularmovies.ConstantMovies.LOG_TAG;
+import static zhevaha.com.popularmovies.ConstantMovies.NAME;
 
 public class CustomTools extends AppCompatActivity implements View.OnClickListener {
 
-
-//    private final String LOG_TAG = "PopularMovies";
-//    private String ISO_COD = "iso_cod";
-//    private String ENGLISH_NAME = "english_name";
-//    private String NAME = "name";
     private TextView mLanguageText;
     private List<Language> mLanguagesArray;
 
@@ -64,7 +62,7 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
         String englishName = mLanguagesArray.get( item ).getEnglishName();
         String name = mLanguagesArray.get( item ).getName();
         String languageCod = mLanguagesArray.get( item ).getLanguageCod();
-        ed.putString( String.valueOf(ENGLISH_NAME), englishName );
+        ed.putString( String.valueOf( ENGLISH_NAME ), englishName );
         ed.putString( String.valueOf( NAME ), name );
         ed.putString( String.valueOf( ISO_COD ), languageCod );
         ed.commit();
@@ -132,15 +130,18 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
             BufferedReader reader = null;
             StringBuilder builder = new StringBuilder();
 
+            String apiKey = new ApiKey( getApplicationContext() ).getApiKey();
+            String query = "https://api.themoviedb.org/3/configuration/languages?api_key=" + apiKey + "&language";
+
             try {
-                URL url = new URL( "https://api.themoviedb.org/3/configuration/languages?api_key=f4ca38bc9fdb107e48dc28c3483ba7a0&language" );
+                URL url = new URL( query );
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 if (urlConnection != null) {
                     urlConnection.setRequestMethod( "GET" );
                     urlConnection.connect();
                 } else {
-                    Log.d(  String.valueOf( LOG_TAG ), "urlConnection null" );
+                    Log.d( String.valueOf( LOG_TAG ), "urlConnection null" );
                     return null;
                 }
 
@@ -162,13 +163,13 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(  String.valueOf( LOG_TAG ), "Error closing stream", e );
+                        Log.e( String.valueOf( LOG_TAG ), "Error closing stream", e );
                     }
                 } else {
-                    Log.e(  String.valueOf( LOG_TAG ), "reader = null" );
+                    Log.e( String.valueOf( LOG_TAG ), "reader = null" );
                 }
             } catch (IOException e) {
-                Log.e(  String.valueOf( LOG_TAG ), "Error ", e );
+                Log.e( String.valueOf( LOG_TAG ), "Error ", e );
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -187,14 +188,10 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
             return builder.toString();
         }
 
-
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-//                Log.v( LOG_TAG, "String length from onPostExecute(result) = " + result.length() );
-//                Log.v(LOG_TAG, "String from onPostExecute(result): \n" + result);
                 mLanguagesArray = getLanguagesDataFromJson( result );
-//                mLanguageText.setText( result );
             }
         }
     }

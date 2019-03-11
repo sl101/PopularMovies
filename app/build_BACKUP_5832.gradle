@@ -3,7 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
+<<<<<<< HEAD
+        applicationId "zhevaha.com.navigationdrivertest"
+=======
         applicationId "zhevaha.com.popularmovies"
+>>>>>>> workingBranch
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
