@@ -31,16 +31,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static zhevaha.com.popularmovies.ConstantMovies.*;
+import static zhevaha.com.popularmovies.ConstantMovies.ISO_COD;
+import static zhevaha.com.popularmovies.ConstantMovies.LOG_TAG;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-//    private final static String FILE_NAME = "api_key";
+    //    private final static String FILE_NAME = "api_key";
 //    private final String ENGLISH_NAME = "englishName";
 //    private final String LOG_TAG = "PopularMovies";
     NavigationView navigationView;
-//    private String ISO_COD = "iso_cod";
+    //    private String ISO_COD = "iso_cod";
     private String LANGUAGE;
     private GridView gridView;
     private List<Film> mFilmList;
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateFilmLibrary() {
-        String apiKey = getApiKey();
+        String apiKey = new ApiKey( this ).getApiKey();
         String language = getCustomLanguage();
         String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
         new FetchFilmLiblaryTask( generalQuery ).execute();
@@ -108,26 +109,6 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences languagePreferences = getSharedPreferences( String.valueOf( ConstantMovies.APP_PREFERENCES ), Context.MODE_PRIVATE );
         String result = languagePreferences.getString( String.valueOf( ISO_COD ), "xx" );
         return result;
-    }
-
-    private String getApiKey() {
-
-        String result;
-        StringBuilder text = new StringBuilder();
-
-        InputStream is = getResources().openRawResource( R.raw.api_key );
-        try {
-            BufferedReader reader = new BufferedReader( new InputStreamReader( is ) );
-            while ((result = reader.readLine()) != null) {
-                text.append( result );
-            }
-            result = text.toString();
-            reader.close();
-            return result;
-        } catch (IOException e) {
-            Log.d( String.valueOf( LOG_TAG ), e.getMessage() );
-        }
-        return null;
     }
 
     @Override
