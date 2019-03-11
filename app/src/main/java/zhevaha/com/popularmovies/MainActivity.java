@@ -3,7 +3,6 @@ package zhevaha.com.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,14 +21,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static zhevaha.com.popularmovies.ConstantMovies.ISO_COD;
 import static zhevaha.com.popularmovies.ConstantMovies.LOG_TAG;
@@ -96,7 +90,20 @@ public class MainActivity extends AppCompatActivity
         String apiKey = new ApiKey( this ).getApiKey();
         String language = getCustomLanguage();
         String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
-        new FetchFilmLiblaryTask( generalQuery ).execute();
+//        new FetchFilmLiblaryTask( generalQuery ).execute();
+        FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
+        fetchAsyncTask.execute( generalQuery );
+        try {
+            mFilmList = getFilmLibraryDataFromJson( String.valueOf( fetchAsyncTask.get() ) );
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mAdapter = new ImageAdapter( getApplicationContext(), mFilmList );
+        gridView.setAdapter( mAdapter );
     }
 
     private String getCustomLanguage() {
@@ -166,154 +173,53 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private List<Film> getFilmLibraryDataFromJson(String filmLibraryJsonStr)
+            throws JSONException {
+        // These are the names of the JSON objects that need to be extracted.
+        final String POSTER_PATH = "poster_path";
+        final String ADULT = "adult";
+        final String OVERVIEW = "overview";
+        final String RELEASE_DATE = "release_date";
+        final String ORIGINAL_TITLE = "original_title";
+        final String ORIGINAL_LANGUAGE = "original_language";
+        final String TITLE = "title";
+        final String BACKDROP_PATH = "backdrop_path";
+        final String POPULARITY = "popularity";
+        final String VIDEO = "video";
+        final String ID = "id";
+        final String GENRE_IDS = "genre_ids";
+        final String VOTE_COUNT = "vote_count";
+        final String VOTE_AVERAGE = "vote_average";
 
-    private class FetchFilmLiblaryTask extends AsyncTask<String, Void, List<Film>> {
+        List<Film> resultStrs = new ArrayList<>();
+        try {
+            JSONObject filmLibraryJson = new JSONObject( filmLibraryJsonStr );
+            JSONArray filmLibraryArray = filmLibraryJson.getJSONArray( "results" );
 
-        private String mQuery;
+            for (int i = 0; i < filmLibraryArray.length(); i++) {
 
-        FetchFilmLiblaryTask(String query) {
-            mQuery = query;
-        }
+                JSONObject filmLibrary = filmLibraryArray.getJSONObject( i );
+                Film film = new Film();
+                Long id = filmLibrary.getLong( ID );
+                film.setId( id );
+                String originalTitle = filmLibrary.getString( ORIGINAL_TITLE );
+                film.setOriginalTitle( originalTitle );
+                String title = filmLibrary.getString( TITLE );
+                film.setTitle( title );
+                String releaseDate = filmLibrary.getString( RELEASE_DATE );
+                film.setReleaseDate( releaseDate );
+                Double voteAverage = filmLibrary.getDouble( VOTE_AVERAGE );
+                film.setVoteAverage( voteAverage );
+                String overview = filmLibrary.getString( OVERVIEW );
+                film.setOverview( overview );
+                String poster = filmLibrary.getString( POSTER_PATH );
+                film.setPosterPath( poster );
+                resultStrs.add( film );
 
-        private List<Film> getFilmLibraryDataFromJson(String filmLibraryJsonStr)
-                throws JSONException {
-            // These are the names of the JSON objects that need to be extracted.
-            final String POSTER_PATH = "poster_path";
-            final String ADULT = "adult";
-            final String OVERVIEW = "overview";
-            final String RELEASE_DATE = "release_date";
-            final String ORIGINAL_TITLE = "original_title";
-            final String ORIGINAL_LANGUAGE = "original_language";
-            final String TITLE = "title";
-            final String BACKDROP_PATH = "backdrop_path";
-            final String POPULARITY = "popularity";
-            final String VIDEO = "video";
-            final String ID = "id";
-            final String GENRE_IDS = "genre_ids";
-            final String VOTE_COUNT = "vote_count";
-            final String VOTE_AVERAGE = "vote_average";
-
-            List<Film> resultStrs = new ArrayList<>();
-            try {
-                JSONObject filmLibraryJson = new JSONObject( filmLibraryJsonStr );
-                JSONArray filmLibraryArray = filmLibraryJson.getJSONArray( "results" );
-
-                for (int i = 0; i < filmLibraryArray.length(); i++) {
-
-                    JSONObject filmLibrary = filmLibraryArray.getJSONObject( i );
-                    Film film = new Film();
-                    Long id = filmLibrary.getLong( ID );
-                    film.setId( id );
-                    String originalTitle = filmLibrary.getString( ORIGINAL_TITLE );
-                    film.setOriginalTitle( originalTitle );
-                    String title = filmLibrary.getString( TITLE );
-                    film.setTitle( title );
-                    String releaseDate = filmLibrary.getString( RELEASE_DATE );
-                    film.setReleaseDate( releaseDate );
-                    Double voteAverage = filmLibrary.getDouble( VOTE_AVERAGE );
-                    film.setVoteAverage( voteAverage );
-                    String overview = filmLibrary.getString( OVERVIEW );
-                    film.setOverview( overview );
-                    String poster = filmLibrary.getString( POSTER_PATH );
-                    film.setPosterPath( poster );
-                    resultStrs.add( film );
-
-                }
-            } catch (JSONException e) {
-                Log.e( String.valueOf( LOG_TAG ), "JSONException: \n" + e.toString() );
             }
-            return resultStrs;
+        } catch (JSONException e) {
+            Log.e( String.valueOf( LOG_TAG ), "JSONException: \n" + e.toString() );
         }
-
-        @Override
-        protected List<Film> doInBackground(String... strings) {
-
-            if (mQuery == null) {
-                return null;
-            } else {
-                // These two need to be declared outside the try/catch
-                // so that they can be closed in the finally block.
-                HttpURLConnection urlConnection = null;
-                BufferedReader reader = null;
-
-                // Will contain the raw JSON response as a string.
-                String filmLibraryJsonStr;
-                try {
-                    // Construct the URL for the Themoviedb query
-                    // Possible parameters are avaiable at API page
-                    URL url = new URL( mQuery );
-
-                    // Create the request to Themoviedb, and open the connection
-                    urlConnection = (HttpURLConnection) url.openConnection();
-                    if (urlConnection != null) {
-                        urlConnection.setRequestMethod( "GET" );
-                        urlConnection.connect();
-                    } else {
-                        Log.d( String.valueOf( LOG_TAG ), "urlConnection null" );
-                        return null;
-                    }
-
-                    InputStream inputStream = urlConnection.getInputStream();
-                    StringBuilder builder = new StringBuilder();
-
-                    if (inputStream == null) {
-                        return null;
-                    }
-                    reader = new BufferedReader( new InputStreamReader( inputStream ) );
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        builder.append( line + "\n" );
-                    }
-                    if (builder.length() == 0) {
-
-                        Log.v( String.valueOf( LOG_TAG ), "FilmLibrary string: " + null );
-                        return null;
-                    }
-                    filmLibraryJsonStr = builder.toString();
-
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (final IOException e) {
-                            Log.e( String.valueOf( LOG_TAG ), "Error closing stream", e );
-                        }
-                    } else {
-                        Log.e( String.valueOf( LOG_TAG ), "reader = null" );
-                    }
-                } catch (IOException e) {
-                    Log.e( String.valueOf( LOG_TAG ), "Error ", e );
-                    return null;
-                } finally {
-                    if (urlConnection != null) {
-                        urlConnection.disconnect();
-                    }
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (final IOException e) {
-                            Log.e( String.valueOf( LOG_TAG ), "Error closing stream", e );
-                        }
-                    }
-                }
-
-                try {
-                    return getFilmLibraryDataFromJson( filmLibraryJsonStr );
-                } catch (JSONException e) {
-                    Log.e( String.valueOf( LOG_TAG ), e.getMessage(), e );
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        }
-
-
-        @Override
-        protected void onPostExecute(List<Film> result) {
-            if (result != null) {
-                mFilmList = result;
-                mAdapter = new ImageAdapter( getApplicationContext(), mFilmList );
-                gridView.setAdapter( mAdapter );
-            }
-        }
+        return resultStrs;
     }
 }
