@@ -10,9 +10,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static zhevaha.com.popularmovies.ConstantMovies.LOG_TAG;
 
 public class FetchAsyncTask extends AsyncTask {
+
+
+    private final String LOG_TAG = "PopularMovies";
+
     @Override
     protected Object doInBackground(Object[] objects) {
 
@@ -39,7 +42,7 @@ public class FetchAsyncTask extends AsyncTask {
                     urlConnection.setRequestMethod( "GET" );
                     urlConnection.connect();
                 } else {
-                    Log.d( String.valueOf( LOG_TAG ), "urlConnection null" );
+                    Log.d( LOG_TAG, "urlConnection null" );
                     return null;
                 }
 
@@ -55,7 +58,7 @@ public class FetchAsyncTask extends AsyncTask {
                     builder.append( line + "\n" );
                 }
                 if (builder.length() == 0) {
-                    Log.v( String.valueOf( LOG_TAG ), "expectedString " + null );
+                    Log.v( LOG_TAG, "expectedString " + null );
                     return null;
                 }
                 expectedString = builder.toString();
@@ -64,13 +67,13 @@ public class FetchAsyncTask extends AsyncTask {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e( String.valueOf( LOG_TAG ), "Error closing stream", e );
+                        Log.e( LOG_TAG, "Error closing stream", e );
                     }
                 } else {
-                    Log.e( String.valueOf( LOG_TAG ), "reader = null" );
+                    Log.e( LOG_TAG, "reader = null" );
                 }
             } catch (IOException e) {
-                Log.e( String.valueOf( LOG_TAG ), "Error ", e );
+                Log.e( LOG_TAG, "Error ", e );
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -80,7 +83,7 @@ public class FetchAsyncTask extends AsyncTask {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e( String.valueOf( LOG_TAG ), "Error closing stream", e );
+                        Log.e( LOG_TAG, "Error closing stream", e );
                     }
                 }
             }

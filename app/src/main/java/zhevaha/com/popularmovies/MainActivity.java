@@ -26,14 +26,14 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static zhevaha.com.popularmovies.ConstantMovies.ISO_COD;
-import static zhevaha.com.popularmovies.ConstantMovies.LOG_TAG;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     //    private final static String FILE_NAME = "api_key";
 //    private final String ENGLISH_NAME = "englishName";
-//    private final String LOG_TAG = "PopularMovies";
+    private static final String LOG_TAG = "PopularMoview";
+    private final String FILM_LIST = "filmlList";
     NavigationView navigationView;
     //    private String ISO_COD = "iso_cod";
     private String LANGUAGE;
@@ -41,20 +41,29 @@ public class MainActivity extends AppCompatActivity
     private List<Film> mFilmList;
     private ImageAdapter mAdapter;
     private TextView mSelectText;
+    //    private String apiKey;
     private GridView.OnItemClickListener gridviewOnItemClickListener = new GridView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View v, int position,
                                 long id) {
             Film film = mFilmList.get( position );
+//            Log.d(LOG_TAG, "film position "+position);
             Intent intent = new Intent( MainActivity.this, FilmOverview.class );
             intent.putExtra( Film.class.getSimpleName(), film );
+//            ArrayList<CharSequence> filmsPicturePath = new ArrayList<CharSequence>();
+//            Log.d(LOG_TAG, "films \n");
+//            for (Film item : mFilmList) {
+//                filmsPicturePath.add( item.getPosterPath() );
+////                Log.d(LOG_TAG, " "+item.getPosterPath());
+//            }
+//            intent.putCharSequenceArrayListExtra( FILM_LIST, filmsPicturePath );
             startActivity( intent );
         }
     };
 
     @Override
     protected void onRestart() {
-//        Log.d( String.valueOf( LOG_TAG ), "LANGUAGE = " + LANGUAGE );
+//        Log.d( LOG_TAG, "LANGUAGE = " + LANGUAGE );
 //        Log.d( String.valueOf( LOG_TAG ), "readPrefLanguage() = " + readPrefLanguage() );
         if (LANGUAGE != readPrefLanguage()) {
             updateFilmLibrary();
@@ -66,6 +75,12 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
+
+//        Log.d( LOG_TAG, "START "  );
+//        Log.d( LOG_TAG , "START LOG_TAG"  );
+        Log.d( LOG_TAG , "START PopularMovies"  );
+//        String apiKey = new ApiKey( this ).getApiKey();
+//        String apiKey = new ApiKey().getApiKey();
 
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
@@ -80,16 +95,20 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener( this );
 
         mSelectText = findViewById( R.id.ad_Block );
+
         gridView = findViewById( R.id.gv_images );
         gridView.setOnItemClickListener( gridviewOnItemClickListener );
+
         updateFilmLibrary();
 
     }
 
     private void updateFilmLibrary() {
-        String apiKey = new ApiKey( this ).getApiKey();
+//        String apiKey = new ApiKey( this ).getApiKey();
         String language = getCustomLanguage();
-        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
+//        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
+
+        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + "f4ca38bc9fdb107e48dc28c3483ba7a0" + language;
 //        new FetchFilmLiblaryTask( generalQuery ).execute();
         FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
         fetchAsyncTask.execute( generalQuery );
@@ -218,7 +237,7 @@ public class MainActivity extends AppCompatActivity
 
             }
         } catch (JSONException e) {
-            Log.e( String.valueOf( LOG_TAG ), "JSONException: \n" + e.toString() );
+            Log.e( LOG_TAG, "JSONException: \n" + e.toString() );
         }
         return resultStrs;
     }

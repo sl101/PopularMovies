@@ -9,14 +9,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import static zhevaha.com.popularmovies.ConstantMovies.LOG_TAG;
 
 public class ApiKey extends AppCompatActivity {
+
+
+    private final String LOG_TAG = "PopularMovies";
 
     private Context mContext;
 
     public ApiKey(Context current) {
         mContext = current;
+    }
+
+    public ApiKey() {
+        mContext = getApplicationContext();
     }
 
     private String readApiKey() {
@@ -32,10 +38,10 @@ public class ApiKey extends AppCompatActivity {
             }
             result = text.toString();
             reader.close();
-            Log.d( String.valueOf( LOG_TAG ), "Api Key = " + result );
+            Log.d( LOG_TAG, "Api Key = " + result );
             return result;
         } catch (IOException e) {
-            Log.d( String.valueOf( LOG_TAG ), e.getMessage() );
+            Log.d( LOG_TAG, e.getMessage() );
         }
         return null;
     }

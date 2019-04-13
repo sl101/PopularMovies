@@ -24,6 +24,7 @@
         </activity>
         <activity android:name="zhevaha.com.popularmovies.FilmOverview"></activity>
         <activity android:name="zhevaha.com.popularmovies.CustomTools"></activity>
+
     </application>
 
 </manifest>

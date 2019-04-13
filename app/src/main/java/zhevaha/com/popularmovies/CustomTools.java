@@ -31,6 +31,7 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
 //    private String ISO_COD = "iso_cod";
 //    private String ENGLISH_NAME = "english_name";
 //    private String NAME = "name";
+    private String apiKey;
     private TextView mLanguageText;
     private List<Language> mLanguagesArray;
 
@@ -42,7 +43,8 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
 
         mLanguagesArray = new ArrayList<>();
 
-        String apiKey = new ApiKey( getApplicationContext() ).getApiKey();
+        apiKey = new ApiKey(this).getApiKey();
+//       apiKey = new ApiKey().getApiKey();
         String query = "https://api.themoviedb.org/3/configuration/languages?api_key=" + apiKey + "&language";
         FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
         fetchAsyncTask.execute( query );
