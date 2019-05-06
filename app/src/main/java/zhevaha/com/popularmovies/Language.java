@@ -10,23 +10,24 @@ import static zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.Constan
 
 public class Language {
 
-    private static Language instance;
+//    private static Language instance;
     private final String LOG_TAG = "PopularMovies";
     private String mLanguageCod;
     private String englishName;
     private String name;
 
-    private Language(Context lContext) {
+    public Language(Context lContext) {
         readPrefLanguage( lContext );
     }
 
-    public static Language getInstance(Context lContext) {
-        if (instance == null)
-            instance = new Language( lContext.getApplicationContext() );
-        return instance;
-    }
+//    public static Language getInstance(Context lContext) {
+//        if (instance == null)
+//            instance = new Language( lContext.getApplicationContext() );
+//        return instance;
+//    }
 
     private void readPrefLanguage(Context lContext) {
+
         SharedPreferences languagePreferences = lContext.getSharedPreferences( String.valueOf( APP_PREFERENCES ), Context.MODE_PRIVATE );
         mLanguageCod = languagePreferences.getString( String.valueOf( ISO_COD ), "xx" );
         englishName = languagePreferences.getString( String.valueOf( ENGLISH_NAME ), "No Language" );

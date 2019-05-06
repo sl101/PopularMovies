@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
     private void updateFilmLibrary() {
         String apiKey = ApiKey.getInstance( this ).getApiKey();
         Log.d( LOG_TAG, "apiKey = " + apiKey );
-        String language = getCustomLanguage();
+        String language = createCustomLanguage();
         String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
 
         FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
@@ -118,12 +118,12 @@ public class MainActivity extends AppCompatActivity
         gridView.setAdapter( mAdapter );
     }
 
-    private String getCustomLanguage() {
+    private String createCustomLanguage() {
         return "&language=" + readLanguageCod();
     }
 
     private String readLanguageCod() {
-        return Language.getInstance( this ).getLanguageCod();
+        return new Language( this ).getLanguageCod();
     }
 
     @Override

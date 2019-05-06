@@ -43,6 +43,7 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
         mLanguagesArray = new ArrayList<>();
 
         apiKey = ApiKey.getInstance( this ).getApiKey();
+//    "https://api.themoviedb.org/3/configuration/languages?api_key=f4ca38bc9fdb107e48dc28c3483ba7a0&language"
         String query = "https://api.themoviedb.org/3/configuration/languages?api_key=" + apiKey + "&language";
         FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
         fetchAsyncTask.execute( query );
@@ -56,7 +57,6 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
         }
         if (taskResult != null) {
             mLanguagesArray = getLanguagesDataFromJson( taskResult );
-            Log.d( LOG_TAG, getClass().toString() + "\nLanguagesArray:\n " + mLanguagesArray );
         }
 
         mLanguageText = findViewById( R.id.nav_language );
@@ -111,21 +111,26 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
             JSONArray languagesJsonArray = new JSONArray( languageJsonStr );
             for (int i = 0; i < languagesJsonArray.length(); i++) {
                 JSONObject languageObject = languagesJsonArray.getJSONObject( i );
-//                Language language = new Language();
+                Language language = new Language(this);
                 String cod = languageObject.getString( ISO_COD );
-                Language.getInstance( this ).setLanguageCod( cod );
+//                Language.getInstance( this ).setLanguageCod( cod );
+                language.setLanguageCod( cod );
                 String englishName = languageObject.getString( ENGLISH_NAME );
-                Language.getInstance( this ).setEnglishName( englishName );
+//                Language.getInstance( this ).setEnglishName( englishName );
+                language.setEnglishName( englishName );
                 String name = languageObject.getString( NAME );
                 if (name.length() < 1 || name.contains( "?" )) {
-                    Language.getInstance( this ).setName( englishName );
+//                    Language.getInstance( this ).setName( englishName );
+                    language.setName( englishName );
                 } else if (name.contains( "No Language" )) {
-                    Language.getInstance( this ).setName( "Default (English)" );
+//                    Language.getInstance( this ).setName( "Default (English)" );
+                    language.setName( "Default (English)" );
                 } else {
-                    Language.getInstance( this ).setName( name );
+//                    Language.getInstance( this ).setName( name );
+                   language.setName( name );
                 }
-                resultArray.add( Language.getInstance( this ) );
-
+//                resultArray.add( Language.getInstance( this ) );
+                resultArray.add( language );
             }
         } catch (JSONException e) {
             e.printStackTrace();

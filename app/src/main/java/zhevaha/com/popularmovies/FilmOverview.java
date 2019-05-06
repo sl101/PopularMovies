@@ -72,7 +72,7 @@ public class FilmOverview extends Activity {
 
             long filmId = mFilm.getId();
 //            need to chenge for any language
-            String language = "&language=ru";
+            String language = "&language="+ new Language( getApplicationContext()).getLanguageCod();
             String query = "https://api.themoviedb.org/3/movie/" + filmId + "/videos?api_key=" + apiKey + language;
             FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
             fetchAsyncTask.execute( query );
