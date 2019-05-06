@@ -7,7 +7,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/video"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -25,6 +25,9 @@
         <activity android:name="zhevaha.com.popularmovies.FilmOverview"></activity>
         <activity android:name="zhevaha.com.popularmovies.CustomTools"></activity>
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-1672089289204149~6075886517"/>
     </application>
 
 </manifest>

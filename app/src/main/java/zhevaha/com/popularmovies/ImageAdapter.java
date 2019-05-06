@@ -55,20 +55,10 @@ public class ImageAdapter extends ArrayAdapter<Film> {
         }
         ImageView imageView = view.findViewById( R.id.poster_image_view );
 
-//        RatingBar smallRatingBar = (RatingBar) view.findViewById(R.id.ratingBar);
-//        smallRatingBar.setNumStars(5);
-
-//        TextView textView = (TextView) view.findViewById(R.id.textView);
-//        textView.setText(""+film.getTitle());
-
-//        Film film = filmsArray.get( position );
         Picasso.get()
                 .load( "https://image.tmdb.org/t/p/w500" + film.getPosterPath() )
                 .into( imageView );
 
-//        smallRatingBar.setRating((float) film.getVoteAverage());
-//            textView.setText(""+film.getTitle());
-//            Log.d(LOG_TAG, film.getPosterPath());
         return view;
     }
 }

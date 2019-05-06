@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.util.Log;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
@@ -13,10 +12,12 @@ import com.google.android.youtube.player.YouTubeThumbnailView;
 
 import java.util.List;
 
+import zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.Config;
+
 
 public class TrailerAdapter extends RecyclerView.Adapter<VideoViewHolder> {
 
-    private final String LOG_TAG = "PopularMovies";
+//    private final String LOG_TAG = "PopularMovies";
 
     private List<String> mItemsArray;
     private Context mContext;
@@ -24,7 +25,6 @@ public class TrailerAdapter extends RecyclerView.Adapter<VideoViewHolder> {
     public TrailerAdapter(Context context, List<String> itemsUri) {
         mContext = context;
         mItemsArray = itemsUri;
-        Log.d(LOG_TAG, "class  "+getClass().toString()+"\n trailers array "+mItemsArray);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<VideoViewHolder> {
     public void onBindViewHolder(final VideoViewHolder holder, final int position) {
 
 
-        final YouTubeThumbnailLoader.OnThumbnailLoadedListener  onThumbnailLoadedListener = new YouTubeThumbnailLoader.OnThumbnailLoadedListener(){
+        final YouTubeThumbnailLoader.OnThumbnailLoadedListener onThumbnailLoadedListener = new YouTubeThumbnailLoader.OnThumbnailLoadedListener() {
             @Override
             public void onThumbnailError(YouTubeThumbnailView youTubeThumbnailView, YouTubeThumbnailLoader.ErrorReason errorReason) {
 
@@ -48,24 +48,23 @@ public class TrailerAdapter extends RecyclerView.Adapter<VideoViewHolder> {
 
             @Override
             public void onThumbnailLoaded(YouTubeThumbnailView youTubeThumbnailView, String s) {
-                youTubeThumbnailView.setVisibility(View.VISIBLE);
-                holder.relativeLayoutOverYouTubeThumbnailView.setVisibility(View.VISIBLE);
+                youTubeThumbnailView.setVisibility( View.VISIBLE );
+                holder.relativeLayoutOverYouTubeThumbnailView.setVisibility( View.VISIBLE );
             }
         };
-
-        holder.youTubeThumbnailView.initialize( Config.YOUTUBE_API_KEY, new YouTubeThumbnailView.OnInitializedListener() {
+        holder.youTubeThumbnailView.initialize( Config.getYoutubeApiKey(), new YouTubeThumbnailView.OnInitializedListener() {
             @Override
             public void onInitializationSuccess(YouTubeThumbnailView youTubeThumbnailView, YouTubeThumbnailLoader youTubeThumbnailLoader) {
 
-                youTubeThumbnailLoader.setVideo(mItemsArray.get( position ));
-                youTubeThumbnailLoader.setOnThumbnailLoadedListener(onThumbnailLoadedListener);
+                youTubeThumbnailLoader.setVideo( mItemsArray.get( position ) );
+                youTubeThumbnailLoader.setOnThumbnailLoadedListener( onThumbnailLoadedListener );
             }
 
             @Override
             public void onInitializationFailure(YouTubeThumbnailView youTubeThumbnailView, YouTubeInitializationResult youTubeInitializationResult) {
                 //write something for failure
             }
-        });
+        } );
 
 
     }

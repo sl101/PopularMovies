@@ -12,26 +12,29 @@
         android:clickable="true"
         card_view:cardCornerRadius="5dp"
         card_view:cardElevation="0dp"
-        card_view:cardPreventCornerOverlap="false"
+        card_view:cardPreventCornerOverlap="true"
         card_view:cardUseCompatPadding="true">
 
 
-        <com.google.android.youtube.player.YouTubeThumbnailView
-            android:id="@+id/youtube_thumbnail"
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:scaleType="centerCrop"
-            android:visibility="visible"/>
-
         <RelativeLayout android:id="@+id/relativeLayout_over_youtube_thumbnail"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_width="176dp"
+            android:layout_height="100dp"
             android:visibility="visible">
 
-            <ImageView android:id="@+id/btnYoutube_player"
+            <com.google.android.youtube.player.YouTubeThumbnailView
+                android:id="@+id/youtube_thumbnail"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="center"
+                android:scaleType="centerCrop"
+                android:layout_centerInParent="true"
+                android:visibility="visible"/>
+
+
+            <ImageView
+                android:id="@+id/btnYoutube_player"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:src="@android:drawable/ic_media_play"/>
 
         </RelativeLayout>

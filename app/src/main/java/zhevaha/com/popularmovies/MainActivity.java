@@ -1,8 +1,6 @@
 package zhevaha.com.popularmovies;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,7 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.TextView;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,47 +26,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static zhevaha.com.popularmovies.ConstantMovies.ISO_COD;
+import zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.ApiKey;
+import zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.Config;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //    private final static String FILE_NAME = "api_key";
-//    private final String ENGLISH_NAME = "englishName";
     private static final String LOG_TAG = "PopularMoview";
-    private final String FILM_LIST = "filmlList";
-    NavigationView navigationView;
-    //    private String ISO_COD = "iso_cod";
+    private NavigationView navigationView;
     private String LANGUAGE;
     private GridView gridView;
     private List<Film> mFilmList;
     private ImageAdapter mAdapter;
-    private TextView mSelectText;
-    //    private String apiKey;
+    private AdView mAdView;
     private GridView.OnItemClickListener gridviewOnItemClickListener = new GridView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View v, int position,
                                 long id) {
             Film film = mFilmList.get( position );
-//            Log.d(LOG_TAG, "film position "+position);
             Intent intent = new Intent( MainActivity.this, FilmOverview.class );
             intent.putExtra( Film.class.getSimpleName(), film );
-//            ArrayList<CharSequence> filmsPicturePath = new ArrayList<CharSequence>();
-//            Log.d(LOG_TAG, "films \n");
-//            for (Film item : mFilmList) {
-//                filmsPicturePath.add( item.getPosterPath() );
-////                Log.d(LOG_TAG, " "+item.getPosterPath());
-//            }
-//            intent.putCharSequenceArrayListExtra( FILM_LIST, filmsPicturePath );
             startActivity( intent );
         }
     };
 
     @Override
     protected void onRestart() {
-//        Log.d( LOG_TAG, "LANGUAGE = " + LANGUAGE );
-//        Log.d( String.valueOf( LOG_TAG ), "readPrefLanguage() = " + readPrefLanguage() );
-        if (LANGUAGE != readPrefLanguage()) {
+        if (LANGUAGE != readLanguageCod()) {
             updateFilmLibrary();
         }
         super.onRestart();
@@ -76,16 +63,16 @@ public class MainActivity extends AppCompatActivity
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_main );
 
-//        Log.d( LOG_TAG, "START "  );
-//        Log.d( LOG_TAG , "START LOG_TAG"  );
-        Log.d( LOG_TAG , "START PopularMovies"  );
-//        String apiKey = new ApiKey( this ).getApiKey();
-//        String apiKey = new ApiKey().getApiKey();
+        showPosterList();
 
-        Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
+    }
+
+    private void showPosterList() {
+
+        Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
 
-        DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
+        DrawerLayout drawer = findViewById( R.id.drawer_layout );
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
         drawer.addDrawerListener( toggle );
@@ -94,22 +81,27 @@ public class MainActivity extends AppCompatActivity
         navigationView = findViewById( R.id.nav_view );
         navigationView.setNavigationItemSelectedListener( this );
 
-        mSelectText = findViewById( R.id.ad_Block );
+        mAdView = findViewById( R.id.adView );
+        MobileAds.initialize( getApplicationContext(), Config.getAppId() );
+        initAdMObBlock();
 
         gridView = findViewById( R.id.gv_images );
         gridView.setOnItemClickListener( gridviewOnItemClickListener );
 
         updateFilmLibrary();
+    }
 
+    private void initAdMObBlock() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd( adRequest );
     }
 
     private void updateFilmLibrary() {
-//        String apiKey = new ApiKey( this ).getApiKey();
+        String apiKey = ApiKey.getInstance( this ).getApiKey();
+        Log.d( LOG_TAG, "apiKey = " + apiKey );
         String language = getCustomLanguage();
-//        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
+        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + language;
 
-        String generalQuery = "http://api.themoviedb.org/3/movie/popular?api_key=" + "f4ca38bc9fdb107e48dc28c3483ba7a0" + language;
-//        new FetchFilmLiblaryTask( generalQuery ).execute();
         FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
         fetchAsyncTask.execute( generalQuery );
         try {
@@ -126,15 +118,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private String getCustomLanguage() {
-        String languageName = readPrefLanguage();
-        LANGUAGE = languageName;
-        return "&language=" + languageName;
+        return "&language=" + readLanguageCod();
     }
 
-    private String readPrefLanguage() {
-        SharedPreferences languagePreferences = getSharedPreferences( String.valueOf( ConstantMovies.APP_PREFERENCES ), Context.MODE_PRIVATE );
-        String result = languagePreferences.getString( String.valueOf( ISO_COD ), "xx" );
-        return result;
+    private String readLanguageCod() {
+        return Language.getInstance( this ).getLanguageCod();
     }
 
     @Override
@@ -147,30 +135,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate( R.menu.main, menu );
-//        return true;
-//    }
-
-    //    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected( item );
-//    }
     private void showToolsMenu(View view) {
         Intent intent = new Intent( this, CustomTools.class );
-        intent.putExtra( "iso_cod", readPrefLanguage() );
+        intent.putExtra( "iso_cod", readLanguageCod() );
         startActivity( intent );
     }
 
@@ -184,12 +151,16 @@ public class MainActivity extends AppCompatActivity
                 showToolsMenu( navigationView );
                 break;
             case R.id.nav_share:
+                onInviteClicked();
                 break;
         }
 
         DrawerLayout drawer = findViewById( R.id.drawer_layout );
         drawer.closeDrawer( GravityCompat.START );
         return true;
+    }
+
+    private void onInviteClicked() {
     }
 
     private List<Film> getFilmLibraryDataFromJson(String filmLibraryJsonStr)

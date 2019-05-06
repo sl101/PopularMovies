@@ -4,20 +4,23 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.ApiKey;
+
 
 public class FilmOverview extends Activity {
 
-    private static final String LOG_TAG = "PopularMoview";
+    //    private static final String LOG_TAG = "PopularMoview";
     private Film mFilm;
     private String apiKey;
     private List<String> mFilmTrailers;
@@ -32,7 +35,7 @@ public class FilmOverview extends Activity {
     private TextView mOverviewView;
     private RatingBar mRatingBarView;
     private RecyclerView mRecyclerView;
-//    private GridView gridView;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +43,7 @@ public class FilmOverview extends Activity {
         setContentView( R.layout.film_overview_layout );
 
 //        Log.d( LOG_TAG, "start FilmOverview class " + getClass().toString() );
-        apiKey = new ApiKey( this ).getApiKey();
-//        apiKey = new ApiKey( ).getApiKey();
+        apiKey = ApiKey.getInstance( this ).getApiKey();
         mArguments = getIntent().getExtras();
 
         mImageView = findViewById( R.id.ivOverview );
@@ -49,7 +51,9 @@ public class FilmOverview extends Activity {
         mTitleView = findViewById( R.id.filmTitle );
         mReleaseDateView = findViewById( R.id.releaseDate );
         mOverviewView = findViewById( R.id.tvOverview );
+        mAdView = findViewById( R.id.adView );
         setUpRecyclerView();
+        initAdMObBlock();
 
         if (mArguments != null) {
             mFilm = (Film) mArguments.getSerializable( Film.class.getSimpleName() );
@@ -67,14 +71,13 @@ public class FilmOverview extends Activity {
             mOverviewView.setText( "\t" + mFilm.getOverview() );
 
             long filmId = mFilm.getId();
-//            String language = new Language().getLanguageCod();
-//            исправить на выбор языка
+//            need to chenge for any language
             String language = "&language=ru";
-            String query = "https://api.themoviedb.org/3/movie/" + filmId + "/videos?api_key=" + apiKey+language;
+            String query = "https://api.themoviedb.org/3/movie/" + filmId + "/videos?api_key=" + apiKey + language;
             FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
             fetchAsyncTask.execute( query );
             try {
-                Log.d( LOG_TAG, "films Uri: \n"+ String.valueOf( fetchAsyncTask.get() ) );
+//                Log.d( LOG_TAG, "films Uri: \n"+ String.valueOf( fetchAsyncTask.get() ) );
                 mFilm.setTrailersUri( String.valueOf( fetchAsyncTask.get() ) );
             } catch (ExecutionException e) {
                 e.printStackTrace();
@@ -82,14 +85,19 @@ public class FilmOverview extends Activity {
                 e.printStackTrace();
             }
         } else {
-            Log.d( LOG_TAG, "mArguments is null" );
+//            Log.d( LOG_TAG, "mArguments is null" );
         }
 
         mFilmTrailers = mFilm.getTrailersUri();
 //        Log.d( LOG_TAG, "mItemsArray  " + mFilmTrailers );
-        mAdapter = new TrailerAdapter( getApplicationContext(), mFilmTrailers );
+        mAdapter = new TrailerAdapter( this, mFilmTrailers );
         mRecyclerView.setAdapter( mAdapter );
 
+    }
+
+    private void initAdMObBlock() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd( adRequest );
     }
 
     private void setUpRecyclerView() {

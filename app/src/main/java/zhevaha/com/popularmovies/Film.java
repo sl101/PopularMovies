@@ -19,25 +19,14 @@ class Film implements Serializable {
     private final String LOG_TAG = "PopularMovies";
 
     private String originalTitle, mTitle, overview, original_language, posterPath, backdropPath, adult, releaseDate;
-//    private String trailerId, trailerKey, trailerName, trailerSite, trailerType;
     private double popularity, voteAverage;
-//    private int trailerSize;
     private long id, voteCount;
     private int[] genreIds;
     private boolean video;
     private String apiKey;
-//    private List<Trailer> mTrailers;
     private List<String> mTrailers;
 
-//    public Film(){
-
-//        apiKey = new ApiKey().getApiKey();
-//        apiKey = new ApiKey(this).getApiKey();
-//        Log.d( String.valueOf( LOG_TAG ), "Film Api Key = " + apiKey );
-//    }
-
     public List<String> getTrailersUri() {
-//        public List<Trailer> getTrailersUri() {
         return mTrailers;
     }
 
@@ -76,9 +65,6 @@ class Film implements Serializable {
                 String trailerType = trailerJson.getString( TRAILER_TYPE );
                 trailer.setTrailerType( trailerType );
 
-//                String query = "https://api.themoviedb.org/3/movie/"+"/videos?api_key=<<api_key>>&language=en-US";
-//                String query = "https://api.themoviedb.org/3/movie/"+trailer.getTrailerKey()+"/images?api_key="+apiKey+"&language="+trailer.getIsoCOD();
-//                String query = "https://www.youtube.com/watch?v="+trailer.getTrailerKey();
                 String query = trailer.getTrailerKey();
                 mTrailers.add( query );
             }

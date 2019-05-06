@@ -1,31 +1,33 @@
-package zhevaha.com.popularmovies;
+package zhevaha.com.popularmovies.zhevaha.com.popularmovies.config;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import zhevaha.com.popularmovies.R;
 
-public class ApiKey extends AppCompatActivity {
 
+public class ApiKey {
 
-    private final String LOG_TAG = "PopularMovies";
+//    private final String LOG_TAG = "PopularMovies";
 
-    private Context mContext;
+    private static ApiKey instance;
+    private String mApiKey;
 
-    public ApiKey(Context current) {
-        mContext = current;
+    private ApiKey(Context mContext) {
+        readApiKey( mContext );
     }
 
-    public ApiKey() {
-        mContext = getApplicationContext();
+    public static ApiKey getInstance(Context mContext) {
+        if (instance == null)
+            instance = new ApiKey( mContext.getApplicationContext() );
+        return instance;
     }
 
-    private String readApiKey() {
+    private void readApiKey(Context mContext) {
 
         String result;
         StringBuilder text = new StringBuilder();
@@ -36,18 +38,14 @@ public class ApiKey extends AppCompatActivity {
             while ((result = reader.readLine()) != null) {
                 text.append( result );
             }
-            result = text.toString();
+            mApiKey = text.toString();
             reader.close();
-            Log.d( LOG_TAG, "Api Key = " + result );
-            return result;
         } catch (IOException e) {
-            Log.d( LOG_TAG, e.getMessage() );
+//            Log.d( LOG_TAG, e.getMessage() );
         }
-        return null;
     }
 
     public String getApiKey() {
-
-        return readApiKey();
+        return mApiKey;
     }
 }

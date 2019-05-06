@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -19,18 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static zhevaha.com.popularmovies.ConstantMovies.APP_PREFERENCES;
-import static zhevaha.com.popularmovies.ConstantMovies.ENGLISH_NAME;
-import static zhevaha.com.popularmovies.ConstantMovies.ISO_COD;
-import static zhevaha.com.popularmovies.ConstantMovies.NAME;
+import zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.ApiKey;
+
+import static zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.ConstantMovies.APP_PREFERENCES;
+import static zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.ConstantMovies.ENGLISH_NAME;
+import static zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.ConstantMovies.ISO_COD;
+import static zhevaha.com.popularmovies.zhevaha.com.popularmovies.config.ConstantMovies.NAME;
 
 public class CustomTools extends AppCompatActivity implements View.OnClickListener {
 
 
-    //    private final String LOG_TAG = "PopularMovies";
-//    private String ISO_COD = "iso_cod";
-//    private String ENGLISH_NAME = "english_name";
-//    private String NAME = "name";
+        private final String LOG_TAG = "PopularMovies";
     private String apiKey;
     private TextView mLanguageText;
     private List<Language> mLanguagesArray;
@@ -43,8 +43,7 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
 
         mLanguagesArray = new ArrayList<>();
 
-        apiKey = new ApiKey(this).getApiKey();
-//       apiKey = new ApiKey().getApiKey();
+        apiKey = ApiKey.getInstance( this ).getApiKey();
         String query = "https://api.themoviedb.org/3/configuration/languages?api_key=" + apiKey + "&language";
         FetchAsyncTask fetchAsyncTask = new FetchAsyncTask();
         fetchAsyncTask.execute( query );
@@ -58,6 +57,7 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
         }
         if (taskResult != null) {
             mLanguagesArray = getLanguagesDataFromJson( taskResult );
+            Log.d(LOG_TAG, getClass().toString()+"\nLanguagesArray:\n "+mLanguagesArray);
         }
 
         mLanguageText = findViewById( R.id.nav_language );
@@ -112,20 +112,20 @@ public class CustomTools extends AppCompatActivity implements View.OnClickListen
             JSONArray languagesJsonArray = new JSONArray( languageJsonStr );
             for (int i = 0; i < languagesJsonArray.length(); i++) {
                 JSONObject languageObject = languagesJsonArray.getJSONObject( i );
-                Language language = new Language();
+//                Language language = new Language();
                 String cod = languageObject.getString( ISO_COD );
-                language.setLanguageCod( cod );
+                Language.getInstance(this).setLanguageCod( cod );
                 String englishName = languageObject.getString( ENGLISH_NAME );
-                language.setEnglishName( englishName );
+                Language.getInstance(this).setEnglishName( englishName );
                 String name = languageObject.getString( NAME );
                 if (name.length() < 1 || name.contains( "?" )) {
-                    language.setName( englishName );
+                    Language.getInstance(this).setName( englishName );
                 } else if (name.contains( "No Language" )) {
-                    language.setName( "Default (English)" );
+                    Language.getInstance(this).setName( "Default (English)" );
                 } else {
-                    language.setName( name );
+                    Language.getInstance(this).setName( name );
                 }
-                resultArray.add( language );
+                resultArray.add( Language.getInstance(this) );
 
             }
         } catch (JSONException e) {
