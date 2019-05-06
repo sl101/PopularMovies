@@ -1,16 +1,77 @@
 package zhevaha.com.popularmovies;
 
+import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 
 class Film implements Serializable {
 
 
-    private String originalTitle, title, overview, original_language, posterPath, backdropPath, adult, releaseDate;
+    private final String LOG_TAG = "PopularMovies";
+
+    private String originalTitle, mTitle, overview, original_language, posterPath, backdropPath, adult, releaseDate;
     private double popularity, voteAverage;
     private long id, voteCount;
     private int[] genreIds;
     private boolean video;
+    private String apiKey;
+    private List<String> mTrailers;
 
+    public List<String> getTrailersUri() {
+        return mTrailers;
+    }
+
+    public void setTrailersUri(String filmTrailers) {
+        mTrailers = new ArrayList<>( );
+        // These are the names of the JSON objects that need to be extracted.
+        final String TRAILER_ID = "id";
+        final String ISO_COD = "iso_639_1";
+        final String TRAILER_KEY = "key";
+        final String TRAILER_NAME = "name";
+        final String TRAILER_SITE = "site";
+        final String TRAILER_SIZE = "size";
+        final String TRAILER_TYPE = "type";
+
+//        List<Trailer> resultStrs = new ArrayList<>();
+        try {
+            JSONObject jsonObject = new JSONObject( filmTrailers );
+            JSONArray jsonArray = jsonObject.getJSONArray( "results" );
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+
+                JSONObject trailerJson = jsonArray.getJSONObject( i );
+                Trailer trailer = new Trailer();
+                String trailerId = trailerJson.getString( TRAILER_ID );
+                trailer.setTrailerId( trailerId );
+                String iso = trailerJson.getString( ISO_COD );
+                trailer.setIsoCOD( iso );
+                String trailerKey = trailerJson.getString( TRAILER_KEY );
+                trailer.setTrailerKey( trailerKey );
+                String trailerName = trailerJson.getString( TRAILER_NAME );
+                trailer.setTrailerName( trailerName );
+                String trailerSite = trailerJson.getString( TRAILER_SITE );
+                trailer.setTrailerSite( trailerSite );
+                int trailerSize = trailerJson.getInt( TRAILER_SIZE );
+                trailer.setTrailerSize( trailerSize );
+                String trailerType = trailerJson.getString( TRAILER_TYPE );
+                trailer.setTrailerType( trailerType );
+
+                String query = trailer.getTrailerKey();
+                mTrailers.add( query );
+            }
+        } catch (JSONException e) {
+            Log.e( LOG_TAG , "JSONException: \n" + e.toString() );
+        }
+    }
 
     public String getOriginalTitle() {
         return originalTitle;
@@ -20,12 +81,12 @@ class Film implements Serializable {
         this.originalTitle = originalTitle;
     }
 
-    public String getTitle() {
-        return title;
+    public String getFilmTitle() {
+        return mTitle;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.mTitle = title;
     }
 
     public String getOverview() {
@@ -73,8 +134,6 @@ class Film implements Serializable {
     }
 
     public void setReleaseDate(String releaseDate) {
-//        SimpleDateFormat sdf = new SimpleDateFormat("MMMM.dd.yyyy");
-//        this.releaseDate = sdf.format(releaseDate).toString();
         this.releaseDate = releaseDate;
     }
 
@@ -125,4 +184,5 @@ class Film implements Serializable {
     public void setVideo(boolean video) {
         this.video = video;
     }
+
 }
